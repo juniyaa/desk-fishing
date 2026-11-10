@@ -3,7 +3,7 @@
 화면 구석에 늘 떠 있는 작은 낚시터. 엑셀을 켜 놓은 채로 **Ctrl**만 눌러서 낚시하고,
 잡은 물고기를 팔아 번 돈으로 장비를 사서 캐릭터를 키우는 게임이에요.
 
-## 실행 (Windows)
+## 내 PC에서 바로 실행해 보기 (Windows, 빠른 테스트용)
 
 1. [Node.js](https://nodejs.org) LTS 설치
 2. 이 폴더에서:
@@ -18,40 +18,22 @@ npm start
 
 화면 오른쪽 아래에 낚시터가 떠요. 위쪽 막대를 잡고 끌면 옮길 수 있어요.
 
-## 설치 파일(.exe) 만들기
+## 내 PC에서 설치 파일(.exe) 직접 만들기 (선택)
 
 ```bash
 npm run dist
 ```
 
-`dist/` 폴더에 설치 파일이 생겨요. 설치하면 `AppData\Local\Programs\DeskFishing` 아래에 깔려요.
+`dist/` 폴더에 설치 파일이 생겨요. 보통은 GitHub가 대신 만들어 주니 안 해도 돼요.
 
-## 자동 업데이트 (GitHub Releases)
+## 자동 업데이트 (GitHub에서 고치면 끝)
 
-설치형(`DeskFishing Setup x.x.x.exe`)으로 깔면, 켜질 때와 1시간마다 새 버전을 확인해서 받아 둬요.
-다 받으면 낚시터에 ⬆ 버튼이 생기고, 누르거나 다음에 껐다 켜면 새 버전이 돼요. zip 버전은 자동 업데이트가 안 돼요.
+1. GitHub 웹사이트에서 파일을 열고 연필(✏️) 아이콘으로 고친 뒤 **Commit changes**를 눌러요.
+2. GitHub Actions가 윈도우용 설치 파일을 자동으로 만들어서 **Releases**에 올려요. 몇 분 걸리고, 진행 상황은 **Actions** 탭에서 볼 수 있어요. 버전(0.2.1, 0.2.2 …)도 자동으로 올라가요.
+3. 설치형(`DeskFishing Setup ….exe`)으로 깔아 둔 게임은 켜질 때와 1시간마다 새 버전을 확인해서 받아 둬요.
+   다 받으면 낚시터에 ⬆ 버튼이 생기고, 누르거나 다음에 껐다 켜면 새 버전이 돼요. zip 버전은 자동 업데이트가 안 돼요.
 
-처음 한 번 준비:
-1. GitHub 가입 후 **Public** 저장소 `desk-fishing`을 만들어요. 코드는 안 올려도 돼요. 설치 파일만 Releases에 올라가요.
-2. `package.json`의 `"owner": "YOUR_GITHUB_ID"`를 내 GitHub 아이디로 바꿔요.
-3. GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic) → **Generate new token (classic)**, `repo`를 체크하고 만든 토큰을 복사해요.
-4. 명령 프롬프트에서 아래처럼 저장해요. 그 뒤 **명령 프롬프트를 새로 열어야** 적용돼요.
-
-```bash
-setx GH_TOKEN "복사한토큰"
-```
-
-새 버전 올리기 (코드를 고칠 때마다):
-
-```bash
-npm version patch --no-git-tag-version
-```
-
-```bash
-npm run release
-```
-
-첫 줄은 버전을 0.1.0 → 0.1.1처럼 올리고, 둘째 줄은 설치 파일을 만들어 GitHub에 올려요. 버전을 안 올리면 업데이트로 인식되지 않아요.
+처음 설치는 저장소의 **Releases**에서 가장 최신 `DeskFishing Setup ….exe`를 받아서 실행하면 돼요.
 
 ## 하는 법
 
