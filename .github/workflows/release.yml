@@ -14,13 +14,20 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
       - run: npm install
       # 실행할 때마다 버전을 0.2.1, 0.2.2 … 로 자동으로 올림 (그래야 업데이트로 인식됨)
       - run: npm version 0.2.${{ github.run_number }} --no-git-tag-version
-      - run: npx electron-builder --win --publish always
+      - run: npx electron-builder --win --publish never
+      # 설치 파일 + 자동 업데이트용 latest.yml 을 새 릴리스로 올림
+      - name: GitHub Releases에 올리기
+        shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=0.2.${{ github.run_number }}
+          gh release create "v$VERSION" dist/*.exe dist/*.blockmap dist/latest.yml \
+            --target "${{ github.sha }}" --title "v$VERSION" --notes "자동 빌드 v$VERSION"
