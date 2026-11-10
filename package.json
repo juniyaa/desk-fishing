@@ -1,0 +1,42 @@
+{
+  "name": "desk-fishing",
+  "version": "0.1.0",
+  "description": "책상 구석에서 몰래 하는 낚시 — 잡아서 팔고, 장비를 사요",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win",
+    "release": "electron-builder --win --publish always"
+  },
+  "dependencies": {
+    "uiohook-napi": "^1.5.5",
+    "electron-updater": "^6.8.11"
+  },
+  "devDependencies": {
+    "electron": "^45.1.0",
+    "electron-builder": "^26.0.0"
+  },
+  "build": {
+    "appId": "com.myname.deskfishing",
+    "productName": "DeskFishing",
+    "npmRebuild": false,
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**/*"
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "releaseType": "release"
+      }
+    ]
+  }
+}

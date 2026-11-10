@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'">
+<title>책상 낚시터</title>
+<style>
+  html, body { margin: 0; background: transparent; overflow: hidden; user-select: none;
+    font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif; }
+  #bar { height: 26px; display: flex; align-items: center; gap: 4px; padding: 0 6px 0 10px;
+    background: rgba(18, 18, 18, .72); color: #ccc; font-size: 12px; border-radius: 6px;
+    -webkit-app-region: drag; /* 이 막대를 잡고 창을 옮김 */ }
+  #money { color: #ffd34d; font-weight: bold; flex: 1; margin-left: 6px; }
+  #loc { color: #8fc1ff; max-width: 90px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  #bar button { -webkit-app-region: no-drag; background: none; border: 0; color: #bbb;
+    cursor: pointer; font-size: 14px; padding: 2px 5px; }
+  #bar button:hover { color: #fff; }
+  #bar #update { color: #3ddc84; font-weight: bold; }
+  #stage { position: relative; width: 280px; height: 100px; }
+  canvas { width: 280px; height: 100px; image-rendering: pixelated; display: block; cursor: pointer; }
+  #msg { position: absolute; left: 0; right: 0; top: 2px; text-align: center; font-size: 12px;
+    font-weight: bold; color: #fff; pointer-events: none;
+    text-shadow: 0 1px 2px #000, 0 0 3px #000, 0 0 3px #000; }
+  #bag { margin-left: 4px; }
+  #gain { position: absolute; right: 10px; top: 20px; color: #ffd34d; font-weight: bold; font-size: 13px;
+    opacity: 0; pointer-events: none; text-shadow: 0 1px 2px #000; }
+  #gain.show { animation: rise 1.4s ease-out; }
+  @keyframes rise { 0% { opacity: 0; transform: translateY(6px); } 15% { opacity: 1; }
+    80% { opacity: 1; } 100% { opacity: 0; transform: translateY(-14px); } }
+</style>
+</head>
+<body>
+  <div id="bar">
+    <span id="loc" title="지금 장소"></span><span id="bag" title="어망 (상점에서 팔면 돈이 돼요)"></span><span id="money" title="지갑">₩0</span>
+    <button id="menu" title="도감 · 수익 · 설정">☰</button>
+    <button id="update" title="새 버전으로 업데이트" hidden>⬆</button>
+    <button id="close" title="종료">×</button>
+  </div>
+  <div id="stage">
+    <canvas id="c" width="140" height="50"></canvas>
+    <div id="msg"></div>
+    <div id="gain"></div>
+  </div>
+  <script src="shared.js"></script>
+  <script src="widget.js"></script>
+</body>
+</html>

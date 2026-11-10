@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'">
+<title>책상 낚시터</title>
+<style>
+  :root { --bg: #111; --card: #1a1a1a; --line: #333; --text: #e8e8e8; --dim: #888; --gold: #ffd34d; --green: #3ddc84; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif; font-size: 14px; }
+  header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; }
+  header b { font-size: 16px; }
+  header b::before { content: ''; display: inline-block; width: 6px; height: 14px; background: #e74c3c; margin-right: 8px; vertical-align: -2px; }
+  #head-money { color: var(--gold); font-weight: bold; }
+  nav { display: flex; border-bottom: 1px solid var(--line); }
+  nav button { flex: 1; padding: 12px 0; font-size: 13px !important; background: none; border: 0; border-bottom: 2px solid transparent; color: var(--dim); font: inherit; cursor: pointer; }
+  nav button.on { color: var(--text); border-bottom-color: var(--text); background: #1d1d1d; }
+  main { padding: 14px; }
+  section { display: none; }
+  section.on { display: block; }
+  .card { background: var(--card); border: 1px solid var(--line); padding: 16px; margin-bottom: 12px; }
+  .center { text-align: center; }
+  .dim { color: var(--dim); font-size: 12px; }
+  .big { font-size: 40px; font-weight: 900; color: var(--gold); margin: 6px 0; letter-spacing: 1px; }
+  .row { display: flex; justify-content: space-between; align-items: baseline; }
+  .gold { color: var(--gold); font-weight: bold; }
+  .best { display: inline-block; margin-top: 10px; padding: 4px 10px; border: 1px solid #7a5cff; font-size: 13px; }
+  .chart { display: flex; align-items: flex-end; gap: 4px; height: 110px; margin-top: 12px; }
+  .chart div { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; }
+  .chart i { display: block; width: 100%; background: #555; min-height: 1px; }
+  .chart i.today { background: var(--gold); }
+  .chart span { font-size: 10px; color: var(--dim); margin-top: 4px; }
+  .dex { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .dex .fish { background: var(--card); border: 1px solid var(--line); padding: 10px 6px; text-align: center; font-size: 12px; }
+  .dex .shape { width: 40px; height: 14px; margin: 4px auto 8px; border-radius: 50% 40% 40% 50%; position: relative; }
+  .dex .shape::before { content: ''; position: absolute; left: -8px; top: 1px; border: 6px solid transparent; border-right-color: inherit; border-right: 8px solid; border-right-color: inherit; }
+  .dex .unknown .shape { background: #333 !important; color: #333 !important; }
+  .dex .name { font-weight: bold; font-size: 13px; }
+  label.opt { display: inline-block; margin: 4px 6px 4px 0; padding: 6px 10px; border: 1px solid var(--line); cursor: pointer; }
+  label.opt:has(input:checked) { background: #eee; color: #111; }
+  label.opt input { display: none; }
+  .ok { color: var(--green); }
+  .warn { color: #ffb74d; }
+  ol { padding-left: 20px; line-height: 1.7; margin: 8px 0 0; }
+  .bar { height: 8px; background: #333; margin: 10px 30px 6px; }
+  .bar i { display: block; height: 100%; background: var(--gold); }
+  #char-canvas { width: 120px; height: 120px; image-rendering: pixelated; }
+  .stat { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #262626; }
+  .item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #262626; }
+  .item:last-child { border-bottom: 0; }
+  .item .info { flex: 1; }
+  .item button { min-width: 84px; padding: 6px 10px; border: 1px solid #555; background: #222; color: var(--text); font: inherit; font-size: 12px; cursor: pointer; }
+  .item button.buy { background: var(--gold); color: #111; border-color: var(--gold); font-weight: bold; }
+  .item button:disabled { opacity: .45; cursor: default; }
+  .card.item { padding: 14px 16px; border-bottom: 1px solid var(--line); }
+  .sellall { padding: 6px 12px; border: 0; background: var(--gold); color: #111; font: inherit; font-size: 12px; font-weight: bold; cursor: pointer; }
+  .sellall:disabled { opacity: .4; cursor: default; }
+  #bag-list { max-height: 260px; overflow-y: auto; }
+  .place.locked { opacity: .55; }
+  h4 { margin: 14px 0 6px; font-size: 13px; color: #8fc1ff; font-weight: normal; }
+  .slider { display: flex; align-items: center; gap: 10px; margin: 8px 0; }
+  .slider span { width: 48px; }
+  .slider input { flex: 1; accent-color: var(--gold); }
+  .slider b { width: 44px; text-align: right; color: var(--gold); }
+  h3 { margin: 0 0 8px; font-size: 14px; color: #bbb; font-weight: normal; }
+</style>
+</head>
+<body>
+  <header><b>책상 낚시터</b><span>지갑 <span id="head-money" class="gold">₩0</span></span></header>
+  <nav>
+    <button data-tab="char" class="on">캐릭터</button>
+    <button data-tab="shop">상점</button>
+    <button data-tab="places">장소</button>
+    <button data-tab="dex">도감</button>
+    <button data-tab="money">수익</button>
+    <button data-tab="settings">설정</button>
+    <button data-tab="info">정보</button>
+  </nav>
+  <main>
+    <section id="char" class="on">
+      <div class="card center">
+        <canvas id="char-canvas" width="40" height="40"></canvas>
+        <div style="font-size:18px;font-weight:bold;margin-top:6px">Lv.<span id="char-level">1</span> 낚시꾼</div>
+        <div class="bar"><i id="char-xp"></i></div>
+        <div class="dim" id="char-xp-text"></div>
+      </div>
+      <div class="card">
+        <h3>능력치 <span class="dim">(장비 + 레벨 보너스)</span></h3>
+        <div id="char-stats"></div>
+      </div>
+      <div class="card">
+        <h3>장착한 장비</h3>
+        <div id="char-equip"></div>
+      </div>
+    </section>
+
+    <section id="shop">
+      <div class="card row"><span>지갑</span><span class="gold" id="shop-wallet">₩0</span></div>
+      <div class="card">
+        <div class="row"><h3>물고기 팔기 <span class="dim" id="bag-count"></span></h3>
+          <button class="sellall" id="sell-all">모두 팔기</button></div>
+        <div id="bag-list"></div>
+      </div>
+      <div class="dim" id="shop-msg" style="text-align:center;min-height:18px;margin-bottom:8px"></div>
+      <div id="shop-list"></div>
+    </section>
+
+    <section id="places">
+      <div class="card row"><span>도감을 채우면 새 장소가 열려요</span><span class="gold" id="places-dex"></span></div>
+      <div id="places-list"></div>
+    </section>
+
+    <section id="money">
+      <div class="card center">
+        <div class="dim">오늘 물고기를 팔아서 번 돈 · 자정에 0부터 다시</div>
+        <div class="big" id="today-money">₩0</div>
+        <div id="today-stats"></div>
+        <div id="today-best"></div>
+      </div>
+      <div class="card">
+        <div class="row"><span>누적 <span class="gold" id="total-money">₩0</span></span><span class="dim" id="total-stats"></span></div>
+      </div>
+      <div class="card">
+        <div class="row"><span>최근 14일</span><span class="dim" id="record"></span></div>
+        <div class="chart" id="chart"></div>
+      </div>
+    </section>
+
+    <section id="dex">
+      <div class="card row"><span>도감</span><span class="gold" id="dex-count"></span></div>
+      <div class="dex" id="dex-grid"></div>
+    </section>
+
+    <section id="settings">
+      <div class="card">
+        <h3>낚싯대 키</h3>
+        <div class="dim">꾹 → 떼면 던지기 · 입질 때 누르기 · 꾹 = 감기</div>
+        <div id="key-opts" style="margin-top:8px"></div>
+        <div id="hook-status" style="margin-top:8px;font-size:12px"></div>
+        <div style="margin-top:8px;font-size:12px">키 테스트: <span id="key-test" class="dim">고른 키를 눌러 보세요</span></div>
+      </div>
+      <div class="card">
+        <h3>낚시터 창</h3>
+        <div class="slider">
+          <span>크기</span>
+          <input type="range" id="scale" min="0.75" max="2.5" step="0.25">
+          <b id="scale-val"></b>
+        </div>
+        <div class="slider">
+          <span>선명도</span>
+          <input type="range" id="opacity" min="0.2" max="1" step="0.05">
+          <b id="opacity-val"></b>
+        </div>
+        <div class="dim">선명도를 낮추면 낚시터가 흐릿해져서 옆에서 잘 안 보여요</div>
+      </div>
+      <div class="card">
+        <label><input type="checkbox" id="click"> 낚시터를 클릭해서도 낚시 (꾹 누르기 = 키 꾹)</label>
+      </div>
+    </section>
+
+    <section id="info">
+      <div class="card center">
+        <p style="font-size:16px;margin:4px 0 8px">일하는 척하면서, 화면 구석에서 낚시하기</p>
+        <div class="dim">낚시터는 늘 맨 위에 떠 있어요. 다른 창을 켜 놓은 채로 키만 눌러도 낚시가 돼요.</div>
+      </div>
+      <div class="card row">
+        <span>버전 <b id="version"></b></span>
+        <span id="update-box" class="dim">새 버전이 나오면 자동으로 받아요</span>
+      </div>
+      <div class="card">
+        <h3>하는 법</h3>
+        <ol>
+          <li><b>준비</b> — 어망에 빈칸이 있어야 낚시할 수 있어요. 꽉 차면 상점에서 팔아요.</li>
+          <li><b>던지기</b> — 키를 꾹 누르면 힘 게이지가 왔다 갔다 해요. 떼는 순간 그 거리로 던져요. 멀리 던질수록 희귀한 물고기가 나오지만 오래 기다려요.</li>
+          <li><b>입질</b> — 찌 위에 <b>!</b> 가 뜨면 바로 키를 눌러요. 빠를수록 PERFECT (가격 1.3배).</li>
+          <li><b>힘겨루기</b> — 꾹 = 감기, 떼기 = 풀기. 오른쪽 장력 막대가 빨개지면 손을 떼요. 너무 오래 풀면 도망가요.</li>
+          <li><b>피니시</b> — 움직이는 커서가 <span class="ok">초록 칸</span>에 올 때 눌러요. 희귀할수록 여러 번.</li>
+        </ol>
+        <p class="dim">잡은 물고기는 어망에 담겨요. 상점에서 팔면 크기·희귀도에 맞는 값이 지갑에 들어와요. 그 돈으로 <b>상점</b>에서 장비를 사면 캐릭터 능력치가 올라가고, 도감을 채우면 새 <b>장소</b>가 열려요.</p>
+      </div>
+    </section>
+  </main>
+  <script src="shared.js"></script>
+  <script src="panel.js"></script>
+</body>
+</html>

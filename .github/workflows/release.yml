@@ -1,0 +1,26 @@
+# main 브랜치에 코드가 바뀔 때마다 윈도우용 설치 파일을 만들어서 GitHub Releases에 올림.
+# 깔려 있는 프로그램은 여기 올라온 새 버전을 보고 자동 업데이트함.
+name: release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      # 실행할 때마다 버전을 0.2.1, 0.2.2 … 로 자동으로 올림 (그래야 업데이트로 인식됨)
+      - run: npm version 0.2.${{ github.run_number }} --no-git-tag-version
+      - run: npx electron-builder --win --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
